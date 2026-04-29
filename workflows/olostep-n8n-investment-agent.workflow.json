@@ -15,8 +15,8 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        0,
-        0
+        4640,
+        1120
       ],
       "name": "Weekday Market Open Trigger"
     },
@@ -25,8 +25,8 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
-        192
+        4640,
+        1312
       ],
       "name": "Manual Test Trigger"
     },
@@ -35,25 +35,21 @@
         "assignments": {
           "assignments": [
             {
-              "id": "watchlist-tickers",
               "name": "tickers",
               "type": "string",
               "value": "MSFT,NVDA"
             },
             {
-              "id": "watchlist-report-email-to",
               "name": "email_to",
               "type": "string",
               "value": "recipient@example.com"
             },
             {
-              "id": "watchlist-report-email-from",
               "name": "email_from",
               "type": "string",
               "value": "sender@example.com"
             },
             {
-              "id": "watchlist-report-subject-prefix",
               "name": "email_subject_prefix",
               "type": "string",
               "value": "Daily Investment Research Report"
@@ -65,8 +61,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        224,
-        96
+        4864,
+        1216
       ],
       "name": "Investment Watchlist"
     },
@@ -77,8 +73,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        448,
-        96
+        5088,
+        1216
       ],
       "name": "Split Tickers"
     },
@@ -90,8 +86,8 @@
       "type": "n8n-nodes-olostep.olostepScrape",
       "typeVersion": 1,
       "position": [
-        672,
-        96
+        5312,
+        1216
       ],
       "name": "Olostep Search - Investment Sources"
     },
@@ -102,8 +98,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        896,
-        96
+        5536,
+        1216
       ],
       "name": "Combine Ticker Research"
     },
@@ -128,8 +124,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.2,
       "position": [
-        1120,
-        96
+        5760,
+        1216
       ],
       "name": "OpenAI - Create Full Watchlist Email Report"
     },
@@ -140,8 +136,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1472,
-        96
+        6112,
+        1216
       ],
       "name": "Build HTML Email Body"
     },
@@ -157,12 +153,42 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1696,
-        96
+        6336,
+        1216
       ],
       "name": "Send HTML Email via Gmail"
+    },
+    {
+      "parameters": {
+        "content": "## Daily investment research email\n\n### How it works\nThis workflow researches a stock watchlist with Olostep, summarizes the findings with OpenAI GPT-5.4-mini, and sends one styled Gmail report.\n\n### Setup steps\n- [ ] Add Olostep, OpenAI, and Gmail credentials.\n- [ ] Update the `Investment Watchlist` node with tickers and email fields.\n- [ ] Run `Manual Test Trigger` and review the email before activating.\n\n### Customization\nChange the ticker list, schedule, prompt, subject, or HTML styling to match your research workflow.",
+        "height": 320,
+        "width": 624
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5104,
+        688
+      ],
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "### How can we improve this workflow?\n### Share feedback on the n8n template page or repository.",
+        "height": 96,
+        "width": 624,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5104,
+        1024
+      ],
+      "name": "Sticky Note5"
     }
   ],
+  "pinData": {},
   "connections": {
     "Weekday Market Open Trigger": {
       "main": [
@@ -253,8 +279,16 @@
       ]
     }
   },
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
-  }
+  },
+  "tags": [
+    "AI",
+    "Finance",
+    "Email",
+    "Research",
+    "Automation"
+  ]
 }
