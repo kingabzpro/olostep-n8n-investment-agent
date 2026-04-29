@@ -18,7 +18,6 @@
         0,
         0
       ],
-      "id": "10a37912-7f33-432e-a547-286f4dec112a",
       "name": "Weekday Market Open Trigger"
     },
     {
@@ -29,7 +28,6 @@
         0,
         192
       ],
-      "id": "12f634a8-690d-466a-8cca-fc12aa8b67f7",
       "name": "Manual Test Trigger"
     },
     {
@@ -70,12 +68,11 @@
         224,
         96
       ],
-      "id": "6a00c70d-b243-4164-8586-20d13e43598d",
       "name": "Investment Watchlist"
     },
     {
       "parameters": {
-        "jsCode": "const data = $input.first().json;\nconst tickers = data.tickers.split(',').map(t => t.trim()).filter(Boolean);\nreturn tickers.map(ticker => ({\n  json: {\n    ticker,\n    investment_query: `${ticker} latest investor relations SEC filings earnings call transcript financial news risk factors catalysts`,\n    email_to: data.email_to,\n    email_from: data.email_from,\n    email_subject_prefix: data.email_subject_prefix\n  }\n}));"
+        "jsCode": "const data = $input.first().json;\nconst tickers = data.tickers.split(',').map(function(t) { return t.trim(); }).filter(Boolean);\n\nreturn tickers.map(function(ticker) {\n  return {\n    json: {\n      ticker: ticker,\n      investment_query: ticker + ' latest investor relations SEC filings earnings call transcript financial news risk factors catalysts',\n      email_to: data.email_to,\n      email_from: data.email_from,\n      email_subject_prefix: data.email_subject_prefix\n    }\n  };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -83,7 +80,6 @@
         448,
         96
       ],
-      "id": "b1a726a9-1150-46cd-ab35-96e2edcdaccb",
       "name": "Split Tickers"
     },
     {
@@ -97,12 +93,11 @@
         672,
         96
       ],
-      "id": "eadc11c9-7c32-4066-b116-6e7de508892e",
       "name": "Olostep Search - Investment Sources"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\nconst watchlist = items.map(item => {\n  return {\n    ticker: item.json.ticker || \"Unknown\",\n    sources: item.json.organic || item.json.results || item.json.data || []\n  };\n});\n\nconst first = items[0]?.json || {};\n\nreturn [\n  {\n    json: {\n      report_date: new Date().toISOString().split(\"T\")[0],\n      watchlist,\n      email_to: first.email_to || \"recipient@example.com\",\n      email_from: first.email_from || \"sender@example.com\",\n      email_subject_prefix: first.email_subject_prefix || \"Daily Investment Research Report\"\n    }\n  }\n];"
+        "jsCode": "const items = $input.all();\n\nconst watchlist = items.map(function(item) {\n  return {\n    ticker: item.json.ticker || 'Unknown',\n    sources: item.json.organic || item.json.results || item.json.data || []\n  };\n});\n\nconst first = items.length > 0 ? items[0].json : {};\n\nreturn [\n  {\n    json: {\n      report_date: new Date().toISOString().split('T')[0],\n      watchlist: watchlist,\n      email_to: first.email_to || 'recipient@example.com',\n      email_from: first.email_from || 'sender@example.com',\n      email_subject_prefix: first.email_subject_prefix || 'Daily Investment Research Report'\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -110,7 +105,6 @@
         896,
         96
       ],
-      "id": "885dd7e2-81d5-4b78-a321-32731e7fd4aa",
       "name": "Combine Ticker Research"
     },
     {
@@ -137,12 +131,11 @@
         1120,
         96
       ],
-      "id": "dd421e8e-7a3b-4657-8142-9a415e44550b",
       "name": "OpenAI - Create Full Watchlist Email Report"
     },
     {
       "parameters": {
-        "jsCode": "const markdown = $json.output?.[0]?.content?.[0]?.text || $json.text || \"\";\n\nconst escapeHtml = (str) =>\n  String(str)\n    .replace(/&/g, \"&amp;\")\n    .replace(/</g, \"&lt;\")\n    .replace(/>/g, \"&gt;\");\n\nlet html = escapeHtml(markdown);\n\n// Markdown links and bold\nhtml = html\n  .replace(/\\*\\*(.*?)\\*\\*/gim, \"<strong>$1</strong>\")\n  .replace(/\\[(.*?)\\]\\((.*?)\\)/gim, '<a href=\"$2\">$1</a>');\n\n// Headings\nhtml = html\n  .replace(/^#### (.*$)/gim, \"<h4>$1</h4>\")\n  .replace(/^### (.*$)/gim, \"<h3>$1</h3>\")\n  .replace(/^## (.*$)/gim, \"<h2>$1</h2>\")\n  .replace(/^# (.*$)/gim, \"<h1>$1</h1>\")\n  .replace(/^---$/gim, \"<hr />\");\n\n// Convert simple Markdown tables before paragraph wrapping\nhtml = html.replace(/((?:^|\\n)\\|.+\\|\\n\\|[-:\\s|]+\\|\\n(?:\\|.+\\|\\n?)+)/g, (tableBlock) => {\n  const rows = tableBlock.trim().split(\"\\n\");\n  const headers = rows[0].split(\"|\").slice(1, -1).map(h => h.trim());\n  const bodyRows = rows.slice(2).map(row => row.split(\"|\").slice(1, -1).map(c => c.trim()));\n  const thead = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join(\"\")}</tr></thead>`;\n  const tbody = `<tbody>${bodyRows.map(cols => `<tr>${cols.map(c => `<td>${c}</td>`).join(\"\")}</tr>`).join(\"\")}</tbody>`;\n  return `<table>${thead}${tbody}</table>`;\n});\n\n// Convert bullet lists\nhtml = html.replace(/(?:^|\\n)(- .*(?:\\n- .*)*)/g, (match) => {\n  const items = match\n    .trim()\n    .split(\"\\n\")\n    .map(line => `<li>${line.replace(/^- /, \"\")}</li>`)\n    .join(\"\");\n  return `<ul>${items}</ul>`;\n});\n\n// Convert remaining lines into paragraphs\nhtml = html\n  .split(\"\\n\")\n  .map(line => {\n    const trimmed = line.trim();\n    if (!trimmed) return \"\";\n    if (\n      trimmed.startsWith(\"<h\") ||\n      trimmed.startsWith(\"<ul\") ||\n      trimmed.startsWith(\"<li\") ||\n      trimmed.startsWith(\"</ul\") ||\n      trimmed.startsWith(\"<hr\") ||\n      trimmed.startsWith(\"<table\") ||\n      trimmed.startsWith(\"<thead\") ||\n      trimmed.startsWith(\"<tbody\") ||\n      trimmed.startsWith(\"<tr\") ||\n      trimmed.startsWith(\"<th\") ||\n      trimmed.startsWith(\"<td\") ||\n      trimmed.startsWith(\"</table\")\n    ) {\n      return trimmed;\n    }\n    return `<p>${trimmed}</p>`;\n  })\n  .join(\"\\n\");\n\nconst reportDate = new Date().toISOString().split(\"T\")[0];\nconst subjectPrefix = $json.email_subject_prefix || \"Daily Investment Research Report\";\n\nconst emailHtml = `<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n</head>\n<body style=\"margin:0; padding:0; background:#f3f4f6; font-family:Arial, Helvetica, sans-serif; color:#111827;\">\n  <div style=\"max-width:820px; margin:0 auto; padding:24px 14px;\">\n    <div style=\"background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden;\">\n      <div style=\"padding:22px 24px; border-bottom:3px solid #111827;\">\n        <div style=\"font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#6b7280; margin-bottom:8px;\">\n          Automated Investment Research\n        </div>\n        <h1 style=\"font-size:26px; line-height:1.2; margin:0 0 6px 0; color:#0f172a;\">\n          Daily Investment Research Report\n        </h1>\n        <div style=\"font-size:12px; color:#6b7280;\">Generated on ${reportDate}</div>\n      </div>\n\n      <div style=\"padding:16px 24px; background:#f8fafc; border-bottom:1px solid #e5e7eb; font-size:13px; color:#374151;\">\n        This automated email summarizes opportunity signals, risk signals, and research priorities from public sources. It is not financial advice and does not provide buy, sell, or hold recommendations.\n      </div>\n\n      <div class=\"report-content\" style=\"padding:8px 24px 24px 24px; font-size:14px; line-height:1.55;\">\n        ${html}\n      </div>\n    </div>\n  </div>\n</body>\n</html>`;\n\n// Add email-safe styling after Markdown conversion\nconst styledHtml = emailHtml\n  .replace(/<h1>/g, '<h1 style=\"font-size:24px; line-height:1.2; margin:18px 0 8px; color:#0f172a;\">')\n  .replace(/<h2>/g, '<h2 style=\"font-size:18px; margin:24px 0 10px; padding-bottom:6px; border-bottom:1px solid #e5e7eb; color:#111827;\">')\n  .replace(/<h3>/g, '<h3 style=\"font-size:16px; margin:22px 0 10px; padding:10px 12px; border-left:4px solid #111827; background:#f9fafb; color:#111827;\">')\n  .replace(/<h4>/g, '<h4 style=\"font-size:12px; margin:16px 0 8px; color:#374151; text-transform:uppercase; letter-spacing:0.05em;\">')\n  .replace(/<p>/g, '<p style=\"margin:7px 0;\">')\n  .replace(/<ul>/g, '<ul style=\"margin:8px 0 14px 20px; padding:0;\">')\n  .replace(/<li>/g, '<li style=\"margin:4px 0;\">')\n  .replace(/<a /g, '<a style=\"color:#1d4ed8; text-decoration:none; word-break:break-word;\" ')\n  .replace(/<hr \\/>/g, '<hr style=\"border:0; border-top:1px solid #d1d5db; margin:24px 0;\" />')\n  .replace(/<table>/g, '<table style=\"width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:13px;\">')\n  .replace(/<th>/g, '<th style=\"border:1px solid #e5e7eb; padding:8px; text-align:left; background:#f9fafb;\">')\n  .replace(/<td>/g, '<td style=\"border:1px solid #e5e7eb; padding:8px; vertical-align:top;\">');\n\nreturn [\n  {\n    json: {\n      email_to: $('Split Tickers').first().json.email_to,\n      email_from: $('Split Tickers').first().json.email_from,\n      email_subject: `${subjectPrefix} - ${reportDate}`,\n      email_html: styledHtml\n    }\n  }\n];"
+        "jsCode": "const output = $json.output && $json.output[0] && $json.output[0].content && $json.output[0].content[0] && $json.output[0].content[0].text;\nconst markdown = output || $json.text || '';\n\nfunction escapeHtml(str) {\n  return String(str)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;');\n}\n\nlet html = escapeHtml(markdown);\n\nhtml = html\n  .replace(/\\*\\*(.*?)\\*\\*/gim, '<strong>$1</strong>')\n  .replace(/\\[(.*?)\\]\\((.*?)\\)/gim, '<a href=\"$2\">$1</a>');\n\nhtml = html\n  .replace(/^#### (.*$)/gim, '<h4>$1</h4>')\n  .replace(/^### (.*$)/gim, '<h3>$1</h3>')\n  .replace(/^## (.*$)/gim, '<h2>$1</h2>')\n  .replace(/^# (.*$)/gim, '<h1>$1</h1>')\n  .replace(/^---$/gim, '<hr />');\n\nhtml = html.replace(/((?:^|\\n)\\|.+\\|\\n\\|[-:\\s|]+\\|\\n(?:\\|.+\\|\\n?)+)/g, function(tableBlock) {\n  const rows = tableBlock.trim().split('\\n');\n  const headers = rows[0].split('|').slice(1, -1).map(function(h) { return h.trim(); });\n  const bodyRows = rows.slice(2).map(function(row) {\n    return row.split('|').slice(1, -1).map(function(c) { return c.trim(); });\n  });\n  const thead = '<thead><tr>' + headers.map(function(h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>';\n  const tbody = '<tbody>' + bodyRows.map(function(cols) {\n    return '<tr>' + cols.map(function(c) { return '<td>' + c + '</td>'; }).join('') + '</tr>';\n  }).join('') + '</tbody>';\n  return '<table>' + thead + tbody + '</table>';\n});\n\nhtml = html.replace(/(?:^|\\n)(- .*(?:\\n- .*)*)/g, function(match) {\n  const items = match\n    .trim()\n    .split('\\n')\n    .map(function(line) { return '<li>' + line.replace(/^- /, '') + '</li>'; })\n    .join('');\n  return '<ul>' + items + '</ul>';\n});\n\nhtml = html\n  .split('\\n')\n  .map(function(line) {\n    const trimmed = line.trim();\n    if (!trimmed) return '';\n    if (\n      trimmed.startsWith('<h') ||\n      trimmed.startsWith('<ul') ||\n      trimmed.startsWith('<li') ||\n      trimmed.startsWith('</ul') ||\n      trimmed.startsWith('<hr') ||\n      trimmed.startsWith('<table') ||\n      trimmed.startsWith('<thead') ||\n      trimmed.startsWith('<tbody') ||\n      trimmed.startsWith('<tr') ||\n      trimmed.startsWith('<th') ||\n      trimmed.startsWith('<td') ||\n      trimmed.startsWith('</table')\n    ) {\n      return trimmed;\n    }\n    return '<p>' + trimmed + '</p>';\n  })\n  .join('\\n');\n\nconst reportDate = new Date().toISOString().split('T')[0];\nconst subjectPrefix = $json.email_subject_prefix || 'Daily Investment Research Report';\n\nlet emailHtml = '<!doctype html>';\nemailHtml += '<html><head><meta charset=\"utf-8\"></head>';\nemailHtml += '<body style=\"margin:0; padding:0; background:#f3f4f6; font-family:Arial, Helvetica, sans-serif; color:#111827;\">';\nemailHtml += '<div style=\"max-width:820px; margin:0 auto; padding:24px 14px;\">';\nemailHtml += '<div style=\"background:#ffffff; border:1px solid #e5e7eb; border-radius:12px; overflow:hidden;\">';\nemailHtml += '<div style=\"padding:22px 24px; border-bottom:3px solid #111827;\">';\nemailHtml += '<div style=\"font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:#6b7280; margin-bottom:8px;\">Automated Investment Research</div>';\nemailHtml += '<h1 style=\"font-size:26px; line-height:1.2; margin:0 0 6px 0; color:#0f172a;\">Daily Investment Research Report</h1>';\nemailHtml += '<div style=\"font-size:12px; color:#6b7280;\">Generated on ' + reportDate + '</div>';\nemailHtml += '</div>';\nemailHtml += '<div style=\"padding:16px 24px; background:#f8fafc; border-bottom:1px solid #e5e7eb; font-size:13px; color:#374151;\">';\nemailHtml += 'This automated email summarizes opportunity signals, risk signals, and research priorities from public sources. It is not financial advice and does not provide buy, sell, or hold recommendations.';\nemailHtml += '</div>';\nemailHtml += '<div class=\"report-content\" style=\"padding:8px 24px 24px 24px; font-size:14px; line-height:1.55;\">' + html + '</div>';\nemailHtml += '</div></div></body></html>';\n\nconst styledHtml = emailHtml\n  .replace(/<h1>/g, '<h1 style=\"font-size:24px; line-height:1.2; margin:18px 0 8px; color:#0f172a;\">')\n  .replace(/<h2>/g, '<h2 style=\"font-size:18px; margin:24px 0 10px; padding-bottom:6px; border-bottom:1px solid #e5e7eb; color:#111827;\">')\n  .replace(/<h3>/g, '<h3 style=\"font-size:16px; margin:22px 0 10px; padding:10px 12px; border-left:4px solid #111827; background:#f9fafb; color:#111827;\">')\n  .replace(/<h4>/g, '<h4 style=\"font-size:12px; margin:16px 0 8px; color:#374151; text-transform:uppercase; letter-spacing:0.05em;\">')\n  .replace(/<p>/g, '<p style=\"margin:7px 0;\">')\n  .replace(/<ul>/g, '<ul style=\"margin:8px 0 14px 20px; padding:0;\">')\n  .replace(/<li>/g, '<li style=\"margin:4px 0;\">')\n  .replace(/<a /g, '<a style=\"color:#1d4ed8; text-decoration:none; word-break:break-word;\" ')\n  .replace(/<hr \\/>/g, '<hr style=\"border:0; border-top:1px solid #d1d5db; margin:24px 0;\" />')\n  .replace(/<table>/g, '<table style=\"width:100%; border-collapse:collapse; margin:12px 0 18px; font-size:13px;\">')\n  .replace(/<th>/g, '<th style=\"border:1px solid #e5e7eb; padding:8px; text-align:left; background:#f9fafb;\">')\n  .replace(/<td>/g, '<td style=\"border:1px solid #e5e7eb; padding:8px; vertical-align:top;\">');\n\nreturn [\n  {\n    json: {\n      email_to: $('Split Tickers').first().json.email_to,\n      email_from: $('Split Tickers').first().json.email_from,\n      email_subject: subjectPrefix + ' - ' + reportDate,\n      email_html: styledHtml\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -150,7 +143,6 @@
         1472,
         96
       ],
-      "id": "48e5fae0-2dc8-4add-9762-e72e1540bf6e",
       "name": "Build HTML Email Body"
     },
     {
@@ -168,11 +160,9 @@
         1696,
         96
       ],
-      "id": "81499694-057c-448f-9d16-94c0cda2997b",
       "name": "Send HTML Email via Gmail"
     }
   ],
-  "pinData": {},
   "connections": {
     "Weekday Market Open Trigger": {
       "main": [
@@ -263,23 +253,8 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate"
-  },
-  "tags": [
-    {
-      "name": "Olostep",
-      "id": "NsSSal6pEKzjsy4T",
-      "updatedAt": "2026-04-29T07:22:10.939Z",
-      "createdAt": "2026-04-29T07:22:10.939Z"
-    },
-    {
-      "name": "Investment Research",
-      "id": "UtEgPHsIQ9SrO4Vl",
-      "updatedAt": "2026-04-29T07:22:10.945Z",
-      "createdAt": "2026-04-29T07:22:10.945Z"
-    }
-  ]
+  }
 }
