@@ -1,0 +1,24 @@
+name: olostep-n8n-investment-agent
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: olostep-n8n-investment-agent
+    restart: unless-stopped
+
+    ports:
+      - "5678:5678"
+
+    environment:
+      - GENERIC_TIMEZONE=America/New_York
+      - TZ=America/New_York
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      # Generate with: openssl rand -hex 32
+      # Replace this placeholder locally before running. Do not commit a real key.
+      - N8N_ENCRYPTION_KEY=your_generated_key_here
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:
