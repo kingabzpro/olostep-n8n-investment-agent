@@ -1,5 +1,5 @@
 {
-  "name": "Olostep Investment Research HTML Email - Weekday Market Open",
+  "name": "My workflow",
   "nodes": [
     {
       "parameters": {
@@ -15,20 +15,22 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        4640,
-        1120
+        2352,
+        1024
       ],
-      "name": "Weekday Market Open Trigger"
+      "name": "Weekday Market Open Trigger",
+      "id": "7b8a7091-1a76-426e-a2ac-76eeb1277ca7"
     },
     {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        4640,
-        1312
+        2352,
+        1216
       ],
-      "name": "Manual Test Trigger"
+      "name": "Manual Test Trigger",
+      "id": "ab3663e3-d555-4243-af04-b0f7395248eb"
     },
     {
       "parameters": {
@@ -61,10 +63,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        4864,
-        1216
+        2576,
+        1120
       ],
-      "name": "Investment Watchlist"
+      "name": "Investment Watchlist",
+      "id": "ec693c8f-fd72-4626-9294-24934b575632"
     },
     {
       "parameters": {
@@ -73,10 +76,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5088,
-        1216
+        2800,
+        1120
       ],
-      "name": "Split Tickers"
+      "name": "Split Tickers",
+      "id": "5e7b3d45-94d2-4c80-8599-59866022e983"
     },
     {
       "parameters": {
@@ -86,10 +90,11 @@
       "type": "n8n-nodes-olostep.olostepScrape",
       "typeVersion": 1,
       "position": [
-        5312,
-        1216
+        3024,
+        1120
       ],
-      "name": "Olostep Search - Investment Sources"
+      "name": "Olostep Search - Investment Sources",
+      "id": "7d0aed34-9b35-494f-a62c-ad65bac5a1bb"
     },
     {
       "parameters": {
@@ -98,10 +103,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5536,
-        1216
+        3248,
+        1120
       ],
-      "name": "Combine Ticker Research"
+      "name": "Combine Ticker Research",
+      "id": "dea85597-d922-40e3-a560-d176cee56a1e"
     },
     {
       "parameters": {
@@ -124,10 +130,11 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.2,
       "position": [
-        5760,
-        1216
+        3472,
+        1120
       ],
-      "name": "OpenAI - Create Full Watchlist Email Report"
+      "name": "OpenAI - Create Full Watchlist Email Report",
+      "id": "e86f05d8-2966-40cd-b42f-40e3f7c01363"
     },
     {
       "parameters": {
@@ -136,10 +143,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6112,
-        1216
+        3824,
+        1120
       ],
-      "name": "Build HTML Email Body"
+      "name": "Build HTML Email Body",
+      "id": "b04c6cba-a4f4-4909-ab83-4c4b95c8decd"
     },
     {
       "parameters": {
@@ -153,39 +161,91 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        6336,
-        1216
+        4048,
+        1120
       ],
-      "name": "Send HTML Email via Gmail"
+      "name": "Send HTML Email via Gmail",
+      "id": "00c0cd82-b442-494f-a458-8259609d7b9d",
+      "webhookId": "7b1fdcdd-82dc-4f9c-b4ce-9f23c062e1b0"
     },
     {
       "parameters": {
         "content": "## Daily investment research email\n\n### How it works\nThis workflow researches a stock watchlist with Olostep, summarizes the findings with OpenAI GPT-5.4-mini, and sends one styled Gmail report.\n\n### Setup steps\n- [ ] Add Olostep, OpenAI, and Gmail credentials.\n- [ ] Update the `Investment Watchlist` node with tickers and email fields.\n- [ ] Run `Manual Test Trigger` and review the email before activating.\n\n### Customization\nChange the ticker list, schedule, prompt, subject, or HTML styling to match your research workflow.",
         "height": 320,
-        "width": 624
+        "width": 528
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5104,
-        688
+        1712,
+        912
       ],
-      "name": "Sticky Note4"
+      "name": "Sticky Note8",
+      "id": "01bbe6df-f200-4d8d-9d69-e0cfae8d0150"
     },
     {
       "parameters": {
         "content": "### How can we improve this workflow?\n### Share feedback on the n8n template page or repository.",
-        "height": 96,
-        "width": 624,
+        "height": 80,
+        "width": 528,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        5104,
-        1024
+        1712,
+        1248
       ],
-      "name": "Sticky Note5"
+      "name": "Sticky Note",
+      "id": "2f843fc6-3fe4-4602-bce7-0ce506c29a52"
+    },
+    {
+      "parameters": {
+        "content": "## Trigger and configure\n\nStarts the workflow and prepares the stock watchlist for research.",
+        "height": 464,
+        "width": 448,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        912
+      ],
+      "name": "Sticky Note1",
+      "id": "07ecc92e-0f34-4542-b8b1-fa7b89e8a045"
+    },
+    {
+      "parameters": {
+        "content": "## Research investment sources\n\nSearches public investment sources and combines per-ticker results.",
+        "height": 464,
+        "width": 656,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2752,
+        912
+      ],
+      "name": "Sticky Note2",
+      "id": "050aa094-de32-45b6-9314-532d31fa3f9a"
+    },
+    {
+      "parameters": {
+        "content": "## Generate and send report\n\nCreates the neutral watchlist report, formats it as HTML, and sends it via Gmail.",
+        "height": 464,
+        "width": 768,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3440,
+        912
+      ],
+      "name": "Sticky Note3",
+      "id": "93a026a3-4562-422d-a868-32d2ba3bb27a"
     }
   ],
   "pinData": {},
@@ -284,11 +344,5 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "tags": [
-    "AI",
-    "Finance",
-    "Email",
-    "Research",
-    "Automation"
-  ]
+  "tags": []
 }
